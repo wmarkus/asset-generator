@@ -1,0 +1,9 @@
+# Overlay Images
+
+Place foreground/overlay assets here:
+
+- UI mockup frames
+- Cursor images
+- Any other overlay graphics
+
+These are layered on top of the canvas content.

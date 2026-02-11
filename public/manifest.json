@@ -1,0 +1,21 @@
+{
+  "name": "Copilot Model Launch Kit",
+  "short_name": "Launch Kit",
+  "description": "Asset creator for GitHub Copilot model launch graphics",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "icons": [
+    {
+      "src": "./favicon.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

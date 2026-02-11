@@ -1,0 +1,7 @@
+# Background Images
+
+Place background assets here:
+
+- `grid-bg.png` - Green grid background pattern
+
+These will be loaded and drawn on the canvas.
