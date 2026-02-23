@@ -66,18 +66,32 @@ export function SocialCardCanvas({
   const layout = getSocialLayout(config.heroCount);
 
   // Collect all image sources we need
-  const imageSources = useMemo(() => [
-    getBackgroundPath('Social_Background.jpg'),
-    getOverlayPath(layout.overlay),
-    getOverlayPath('Cursor.png'),
-    getIconPath('sparkle.svg'),
-    getIconPath('dropdown-chevron.svg'),
-    getProviderLogo(config.heroModel1.provider),
-    getProviderLogo(config.heroModel2.provider),
-    getProviderLogo(config.heroModel3.provider),
-    getProviderLogo(config.otherModel1.provider),
-    getProviderLogo(config.otherModel2.provider),
-  ], [config.heroModel1.provider, config.heroModel2.provider, config.heroModel3.provider, config.otherModel1.provider, config.otherModel2.provider, layout.overlay]);
+  const imageSources = useMemo(() => {
+    const sources = [
+      config.backgroundSource === 'custom' && config.customBackgroundUrl
+        ? config.customBackgroundUrl
+        : getBackgroundPath('Social_Background.jpg'),
+      getOverlayPath(layout.overlay),
+      getOverlayPath('Cursor.png'),
+      getIconPath('sparkle.svg'),
+      getIconPath('dropdown-chevron.svg'),
+      getProviderLogo(config.heroModel1.provider),
+      getProviderLogo(config.heroModel2.provider),
+      getProviderLogo(config.heroModel3.provider),
+      getProviderLogo(config.otherModel1.provider),
+      getProviderLogo(config.otherModel2.provider),
+    ];
+    return sources;
+  }, [
+    config.backgroundSource,
+    config.customBackgroundUrl,
+    config.heroModel1.provider,
+    config.heroModel2.provider,
+    config.heroModel3.provider,
+    config.otherModel1.provider,
+    config.otherModel2.provider,
+    layout.overlay,
+  ]);
 
   const images = useMultipleImages(imageSources);
 
@@ -92,7 +106,10 @@ export function SocialCardCanvas({
     ctx.clearRect(0, 0, dimensions.width, dimensions.height);
 
     // Draw background image (or fallback gradient)
-    const bgImg = images[getBackgroundPath('Social_Background.jpg')];
+    const backgroundUrl = config.backgroundSource === 'custom' && config.customBackgroundUrl
+      ? config.customBackgroundUrl
+      : getBackgroundPath('Social_Background.jpg');
+    const bgImg = images[backgroundUrl];
     if (bgImg) {
       ctx.drawImage(bgImg, 0, 0, dimensions.width, dimensions.height);
     } else {

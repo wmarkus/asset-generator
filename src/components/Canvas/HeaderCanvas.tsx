@@ -66,17 +66,31 @@ export function HeaderCanvas({
   };
 
   // Collect all image sources we need
-  const imageSources = useMemo(() => [
-    getBackgroundPath('Header_Background.png'),
-    getOverlayPath(layout.overlay),
-    getOverlayPath('Cursor.png'),
-    getIconPath('dropdown-chevron.svg'),
-    getProviderLogo(config.heroModel1.provider),
-    getProviderLogo(config.heroModel2.provider),
-    getProviderLogo(config.heroModel3.provider),
-    getProviderLogo(config.otherModel1.provider),
-    getProviderLogo(config.otherModel2.provider),
-  ], [config.heroModel1.provider, config.heroModel2.provider, config.heroModel3.provider, config.otherModel1.provider, config.otherModel2.provider, layout.overlay]);
+  const imageSources = useMemo(() => {
+    const sources = [
+      config.backgroundSource === 'custom' && config.customBackgroundUrl
+        ? config.customBackgroundUrl
+        : getBackgroundPath('Header_Background.png'),
+      getOverlayPath(layout.overlay),
+      getOverlayPath('Cursor.png'),
+      getIconPath('dropdown-chevron.svg'),
+      getProviderLogo(config.heroModel1.provider),
+      getProviderLogo(config.heroModel2.provider),
+      getProviderLogo(config.heroModel3.provider),
+      getProviderLogo(config.otherModel1.provider),
+      getProviderLogo(config.otherModel2.provider),
+    ];
+    return sources;
+  }, [
+    config.backgroundSource,
+    config.customBackgroundUrl,
+    config.heroModel1.provider,
+    config.heroModel2.provider,
+    config.heroModel3.provider,
+    config.otherModel1.provider,
+    config.otherModel2.provider,
+    layout.overlay,
+  ]);
 
   const images = useMultipleImages(imageSources);
 
@@ -91,7 +105,10 @@ export function HeaderCanvas({
     ctx.clearRect(0, 0, dimensions.width, dimensions.height);
 
     // Draw background image (or fallback gradient)
-    const bgImg = images[getBackgroundPath('Header_Background.png')];
+    const backgroundUrl = config.backgroundSource === 'custom' && config.customBackgroundUrl
+      ? config.customBackgroundUrl
+      : getBackgroundPath('Header_Background.png');
+    const bgImg = images[backgroundUrl];
     if (bgImg) {
       ctx.drawImage(bgImg, 0, 0, dimensions.width, dimensions.height);
     } else {

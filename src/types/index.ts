@@ -15,6 +15,8 @@ export interface AssetConfig {
   heroModel3: ModelConfig;
   otherModel1: ModelConfig;
   otherModel2: ModelConfig;
+  backgroundSource: 'default' | 'custom';
+  customBackgroundUrl?: string;
 }
 
 export interface CanvasState {
@@ -75,4 +77,5 @@ export const DEFAULT_CONFIG: AssetConfig = {
   heroModel3: { name: 'GPT-5.2-Mini', provider: 'openai' },
   otherModel1: { name: 'Gemini 3 Pro (Preview)', provider: 'google' },
   otherModel2: { name: 'Claude Opus 4.5', provider: 'anthropic' },
+  backgroundSource: 'default',
 };

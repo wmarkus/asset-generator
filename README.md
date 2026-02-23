@@ -11,6 +11,7 @@ An internal asset creator for GitHub Copilot model launch graphics. Designed for
 
 - **Social Card Generator** (2400×1260px) - Create announcement graphics for social media
 - **Header Image Generator** (2064×600px) - Create changelog/blog post headers
+- **AI Background Generator** - Generate custom backgrounds with Krea AI (NEW!)
 - **Live Preview** - See changes in real-time with zoom and pan controls
 - **PNG Export** - Download production-ready assets with one click
 - **Multi-Model Support** - Configure hero model + two additional models with provider logos
@@ -26,10 +27,23 @@ An internal asset creator for GitHub Copilot model launch graphics. Designed for
 
 1. Visit the deployed site (requires GitHub authentication)
 2. Select your asset type (Social Card or Header)
-3. Enter your announcement text
-4. Configure the hero model and other models
-5. Preview your asset in the canvas
-6. Click "Export PNG" to download
+3. **(NEW)** Generate a custom background or use the default
+4. Enter your announcement text
+5. Configure the hero model and other models
+6. Preview your asset in the canvas
+7. Click "Export PNG" to download
+
+### AI Background Generation
+
+Create custom backgrounds using Krea AI:
+
+1. Click "Generate with Krea AI" in the Background section
+2. Describe your desired background (e.g., "futuristic gradient, dark theme")
+3. Select a style preset
+4. Generate and choose from multiple variations
+5. Your custom background applies to both asset types
+
+See [KREA_INTEGRATION.md](./KREA_INTEGRATION.md) for detailed documentation.
 
 ## Development
 
@@ -43,6 +57,10 @@ An internal asset creator for GitHub Copilot model launch graphics. Designed for
 ```bash
 # Install dependencies
 npm install
+
+# (Optional) Configure Krea AI API key
+cp .env.example .env.local
+# Edit .env.local and add your Krea API key
 
 # Start dev server
 npm run dev

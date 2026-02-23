@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Download } from 'lucide-react';
 import { SocialCopyEditor, ModelSelector, HeroCountSelector } from '@/components/Editor';
+import { BackgroundSelector } from '@/components/BackgroundGenerator';
 import type { AssetConfig, AssetType, Provider, HeroCount, FocusedField } from '@/types';
 
 interface SidebarProps {
@@ -78,10 +79,30 @@ export function Sidebar({
     });
   };
 
+  const handleBackgroundChange = (source: 'default' | 'custom', url?: string) => {
+    onConfigChange({
+      ...config,
+      backgroundSource: source,
+      customBackgroundUrl: url,
+    });
+  };
+
   return (
     <aside className="w-80 border-r bg-muted/30 flex flex-col h-full overflow-hidden">
       <div className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-dark" style={{ direction: 'rtl' }}>
         <div className="space-y-3" style={{ direction: 'ltr' }}>
+        {/* Background Selector */}
+        <div className="space-y-2">
+          <h3 className="text-xs font-semibold text-muted-foreground px-1">
+            Background
+          </h3>
+          <BackgroundSelector
+            backgroundSource={config.backgroundSource}
+            customBackgroundUrl={config.customBackgroundUrl}
+            onBackgroundChange={handleBackgroundChange}
+          />
+        </div>
+
         {/* Social Copy */}
         <div className="space-y-2">
           <h3 className="text-xs font-semibold text-muted-foreground px-1">
