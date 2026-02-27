@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Loader2, Sparkles, Image as ImageIcon } from 'lucide-react';
-import { mockGenerateImage, KREA_STYLE_PRESETS, type KreaGenerateRequest } from '@/lib/api/krea';
+import { createKreaClient, pollGenerationStatus, KREA_STYLE_PRESETS, type KreaGenerateRequest } from '@/lib/api/krea';
 
 interface BackgroundGeneratorProps {
   onBackgroundGenerated: (imageUrl: string) => void;
@@ -42,16 +42,32 @@ export function BackgroundGenerator({ onBackgroundGenerated, onClose }: Backgrou
         stylePreset: selectedStyle,
       };
 
-      // Using mock for now - replace with real API when keys are configured
-      const response = await mockGenerateImage(request);
+      const apiKey = import.meta.env.VITE_KREA_API_KEY;
+      if (!apiKey) {
+        setError('Krea API key not configured. Add VITE_KREA_API_KEY to your .env file.');
+        return;
+      }
 
-      if (response.status === 'completed' && response.imageUrl) {
-        setGeneratedHistory(prev => [response.imageUrl!, ...prev]);
-      } else if (response.status === 'failed') {
-        setError(response.error || 'Generation failed');
+      const client = createKreaClient(apiKey);
+      const initial = await client.generateImage(request);
+      console.log('Krea initial response:', initial);
+
+      if (initial.status === 'completed' && initial.imageUrl) {
+        setGeneratedHistory(prev => [initial.imageUrl!, ...prev]);
+      } else if (initial.status === 'failed') {
+        setError(initial.error || 'Generation failed');
+      } else {
+        const response = await pollGenerationStatus(client, initial.id);
+        console.log('Krea final response:', response);
+        if (response.status === 'completed' && response.imageUrl) {
+          setGeneratedHistory(prev => [response.imageUrl!, ...prev]);
+        } else {
+          setError(response.error || 'Generation failed');
+        }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate image');
+      console.error('Krea generation error:', err);
+      setError(err instanceof Error ? err.message : JSON.stringify(err));
     } finally {
       setIsGenerating(false);
     }
@@ -166,15 +182,6 @@ export function BackgroundGenerator({ onBackgroundGenerated, onClose }: Backgrou
         </Card>
       )}
 
-      {/* Info Card */}
-      <Card className="bg-muted/50">
-        <CardContent className="p-4">
-          <p className="text-xs text-muted-foreground">
-            <strong>Note:</strong> Currently using mock generation for development. 
-            Configure your Krea API key in environment variables to enable real generation.
-          </p>
-        </CardContent>
-      </Card>
     </div>
   );
 }

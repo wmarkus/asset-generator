@@ -90,6 +90,44 @@ src/
 
 Automatically deployed to GitHub Pages on push to `main`. The site is private and requires GitHub authentication to access.
 
+### Docker Deployment
+
+The repo now includes a production Docker setup:
+
+- `Dockerfile` (multi-stage build: Node -> Nginx)
+- `nginx.conf` (SPA fallback + static caching)
+- `.dockerignore`
+
+Build and run locally:
+
+```bash
+# Build image
+docker build -t model-launchkit:latest .
+
+# Run container
+docker run --rm -p 8080:80 model-launchkit:latest
+```
+
+Open http://localhost:8080
+
+If you want AI background generation enabled in that build, pass your key at build time:
+
+```bash
+docker build \
+  --build-arg VITE_KREA_API_KEY=your_krea_key \
+  -t model-launchkit:latest .
+```
+
+Example push/deploy flow:
+
+```bash
+# Tag for your registry
+docker tag model-launchkit:latest ghcr.io/<org-or-user>/model-launchkit:latest
+
+# Push
+docker push ghcr.io/<org-or-user>/model-launchkit:latest
+```
+
 
 ## Tech Stack
 

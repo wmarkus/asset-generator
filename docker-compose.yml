@@ -1,0 +1,10 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+        VITE_KREA_API_KEY: ${VITE_KREA_API_KEY:-}
+    image: model-launchkit:latest
+    ports:
+      - "8080:80"
+    restart: unless-stopped

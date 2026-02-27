@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Sparkles, RotateCcw } from 'lucide-react';
+import { Sparkles, RotateCcw, Upload } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -23,6 +23,7 @@ export function BackgroundSelector({
   onBackgroundChange,
 }: BackgroundSelectorProps) {
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleBackgroundGenerated = (imageUrl: string) => {
     onBackgroundChange('custom', imageUrl);
@@ -30,6 +31,14 @@ export function BackgroundSelector({
 
   const handleResetToDefault = () => {
     onBackgroundChange('default');
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    onBackgroundChange('custom', url);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   return (
@@ -75,8 +84,27 @@ export function BackgroundSelector({
             Generate with Krea AI
           </Button>
 
+          <div className="relative">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full"
+            >
+              <Upload className="h-3.5 w-3.5 mr-2" />
+              Upload image
+            </Button>
+          </div>
+
           <p className="text-[10px] text-muted-foreground">
-            Create custom backgrounds using AI or use the default design
+            Generate a background with AI, upload your own, or use the default
           </p>
         </CardContent>
       </Card>

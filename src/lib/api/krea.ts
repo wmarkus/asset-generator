@@ -50,7 +50,7 @@ export const KREA_STYLE_PRESETS: KreaStylePreset[] = [
 
 class KreaAPIClient {
   private apiKey: string;
-  private baseUrl = 'https://api.krea.ai/v1';
+  private baseUrl = 'https://api.krea.ai';
 
   constructor(apiKey: string) {
     this.apiKey = apiKey;
@@ -58,7 +58,7 @@ class KreaAPIClient {
 
   async generateImage(request: KreaGenerateRequest): Promise<KreaGenerateResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/generate`, {
+      const response = await fetch(`${this.baseUrl}/generate/image/bfl/flux-1-dev`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -67,20 +67,20 @@ class KreaAPIClient {
         body: JSON.stringify({
           prompt: request.prompt,
           negative_prompt: request.negativePrompt || 'text, watermark, signature, blur',
-          width: request.width || 2400,
-          height: request.height || 1260,
-          style_preset: request.stylePreset,
+          width: Math.min(request.width || 2400, 2368),
+          height: Math.min(request.height || 1260, 2368),
         }),
       });
 
       if (!response.ok) {
-        throw new Error(`Krea API error: ${response.statusText}`);
+        const errorBody = await response.text();
+        throw new Error(`Krea API error: ${response.status} ${errorBody}`);
       }
 
       const data = await response.json();
       return {
-        id: data.id,
-        status: data.status,
+        id: data.job_id || data.id,
+        status: 'pending',
         imageUrl: data.image_url,
         error: data.error,
       };
@@ -92,7 +92,7 @@ class KreaAPIClient {
 
   async getGenerationStatus(id: string): Promise<KreaGenerateResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/generate/${id}`, {
+      const response = await fetch(`${this.baseUrl}/jobs/${id}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
@@ -104,10 +104,15 @@ class KreaAPIClient {
       }
 
       const data = await response.json();
+      const rawStatus = data.status;
+      const status = (rawStatus === 'finished' || rawStatus === 'completed') ? 'completed' : 
+                     rawStatus === 'failed' ? 'failed' : 'processing';
+      const imageUrl = data.result?.urls?.[0] || data.output_urls?.[0] || data.image_url || data.url;
+      console.log('Krea poll response:', { rawStatus, status, imageUrl, data });
       return {
-        id: data.id,
-        status: data.status,
-        imageUrl: data.image_url,
+        id: data.id || id,
+        status,
+        imageUrl,
         error: data.error,
       };
     } catch (error) {
@@ -138,8 +143,8 @@ export async function mockGenerateImage(_request: KreaGenerateRequest): Promise<
 export async function pollGenerationStatus(
   client: KreaAPIClient,
   id: string,
-  maxAttempts = 30,
-  intervalMs = 2000
+  maxAttempts = 60,
+  intervalMs = 3000
 ): Promise<KreaGenerateResponse> {
   for (let i = 0; i < maxAttempts; i++) {
     const status = await client.getGenerationStatus(id);
